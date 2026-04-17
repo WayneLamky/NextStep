@@ -150,5 +150,5 @@ xcodebuild -project NextStep.xcodeproj -scheme NextStep test
 
 ## 致谢
 
-- 灵感：飞书机器人版 v1 NextStep
+- 灵感：辗转反侧睡不着的我
 - SwiftUI + AppKit 互操作的诸多技巧来自 macOS 开源社区
