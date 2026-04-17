@@ -3,7 +3,7 @@ import Foundation
 import Observation
 import SwiftData
 
-/// M6 · 项目番茄钟
+/// 项目番茄钟
 ///
 /// 设计：
 /// - 同时只允许一个番茄钟。启动新的会自动结束旧的。
@@ -24,7 +24,7 @@ final class PomodoroEngine {
     /// revision bump — SwiftUI 观察者用。
     private(set) var revision: Int = 0
 
-    /// 默认工作时长 25 分钟；休息阶段在 M7 加入。
+    /// 默认工作时长 25 分钟。休息阶段留待后续版本。
     static let defaultDuration: TimeInterval = 25 * 60
 
     private var context: ModelContext { AppStore.shared.context }

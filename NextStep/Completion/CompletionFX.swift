@@ -1,7 +1,7 @@
 import AppKit
 import SwiftUI
 
-/// M6 · 完成反馈
+/// 完成反馈
 ///
 /// 两种可听化的节点：
 /// - `playNextStep()` — 用户按"完成并推下一步"，成功推出下一步时触发
@@ -24,7 +24,7 @@ enum CompletionFX {
     }
 
     private static var soundEnabled: Bool {
-        // `soundEnabled` 默认 true。设置页面 UI 已经在 M2 里连上。
+        // `soundEnabled` 默认 true；用户可在设置 → 通用里关掉。
         UserDefaults.standard.object(forKey: "soundEnabled") as? Bool ?? true
     }
 }

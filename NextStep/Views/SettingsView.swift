@@ -426,7 +426,7 @@ private struct AboutSettingsView: View {
                 .font(.system(size: 56))
                 .foregroundStyle(.tint)
             Text("NextStep").font(.title2).bold()
-            Text("v\(version) · M3").foregroundStyle(.secondary)
+            Text("v\(version)").foregroundStyle(.secondary)
             Text("ADHD 友好的「下一步」仪表盘").font(.callout).foregroundStyle(.secondary)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)

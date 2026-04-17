@@ -24,16 +24,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         WindowRegistry.shared.restoreAll()
         menuBarController?.refreshStatusItem()
 
-        // Markdown sync (M4): picks up saved folder bookmark if any, and
-        // starts FSEvent watcher. No-op when no folder is picked yet —
-        // user kicks it off from Settings → 同步.
+        // Markdown sync: picks up saved folder bookmark if any, and starts
+        // FSEvent watcher. No-op when no folder is picked yet — user kicks
+        // it off from Settings → 同步.
         MarkdownBridge.shared.start(modelContext: AppStore.shared.context)
 
-        // Reminders sync (M5): silently re-attaches if the user previously
+        // Pomodoro: reattach any timer that was running when we quit /
+        // slept. Wall-clock based, so a long gap just ends it.
+        // Reminders sync: silently re-attaches if the user previously
         // granted full access. When a reminder we wrote gets ticked in
         // Reminders.app, fire the project's "推下一步" flow via notification.
-        // Pomodoro (M6): reattach any timer that was running when we quit /
-        // slept. Wall-clock based, so a long gap just ends it.
         PomodoroEngine.shared.resumeActiveAfterLaunch()
 
         RemindersBridge.shared.start(modelContext: AppStore.shared.context)

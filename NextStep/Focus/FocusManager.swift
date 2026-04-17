@@ -2,7 +2,7 @@ import AppKit
 import Observation
 import SwiftUI
 
-/// M6 · 聚焦模式
+/// 聚焦模式
 ///
 /// 桌面上一次只有一张便利贴被聚焦，其他的压在一张 ~40% 黑色 overlay
 /// 背后。overlay 自己 `ignoresMouseEvents`，所以用户点击未聚焦的便利贴

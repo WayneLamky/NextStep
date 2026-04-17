@@ -73,7 +73,7 @@ enum LLMError: LocalizedError {
     }
 }
 
-/// Every provider conforms to this. M3 ships Claude; M7 adds OpenAI + Ollama.
+/// Every provider (Claude / OpenAI / Ollama) conforms to this single entry point.
 protocol LLMProvider: Sendable {
     func generateNextAction(context: NextActionContext) async throws -> NextActionResult
 }

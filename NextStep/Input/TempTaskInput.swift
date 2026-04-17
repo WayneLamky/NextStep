@@ -12,7 +12,8 @@ private final class TempTaskPanel: NSPanel {
 
 /// Thin ~420×44 floating panel that captures a temp task on Enter.
 ///
-/// In M2 we persist the task locally; M5 will add the EventKit round-trip.
+/// Persists the task locally (SwiftData) and mirrors it to Apple Reminders
+/// via EventKit.
 @MainActor
 final class TempTaskInputController: NSObject, NSWindowDelegate {
     static let shared = TempTaskInputController()
@@ -104,7 +105,7 @@ final class TempTaskInputController: NSObject, NSWindowDelegate {
         AppStore.shared.context.insert(task)
         try? AppStore.shared.context.save()
 
-        // M5 — mirror to Reminders.
+        // Mirror to Apple Reminders.
         RemindersBridge.shared.syncTempTask(taskID: task.id)
     }
 

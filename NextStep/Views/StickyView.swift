@@ -74,8 +74,8 @@ private struct StickyContent: View {
             FocusManager.shared.toggle(project.id)
         }
         .onAppear(perform: startFocusPulse)
-        // M5 — when the user ticks our reminder in Reminders.app, behave
-        // exactly as if they tapped "完成并推下一步" inside the sticky.
+        // When the user ticks our reminder in Reminders.app, behave exactly
+        // as if they tapped "完成并推下一步" inside the sticky.
         .onReceive(NotificationCenter.default.publisher(for: .nextStepRemindersCompleted)) { note in
             guard let pid = note.userInfo?["projectID"] as? UUID,
                   pid == project.id else { return }
@@ -363,10 +363,10 @@ private struct StickyContent: View {
     private func touch() {
         project.modifiedAt = .now
         try? modelContext.save()
-        // M4 sync — debounced, safely no-ops if no folder picked.
+        // Markdown sync — debounced, safely no-ops if no folder picked.
         MarkdownBridge.shared.syncSoon(projectID: project.id)
-        // M5 sync — push current next action to Reminders. Safe no-op
-        // when toggle is off / no permission.
+        // Reminders sync — push current next action. Safe no-op when toggle
+        // is off / no permission.
         RemindersBridge.shared.syncProjectNextAction(projectID: project.id)
     }
 
@@ -426,7 +426,7 @@ private struct StickyContent: View {
 
         // Level advance is advisory — the model can suggest "this week's goal
         // is done, move to the next day's action"; we just bump the field for
-        // now. M6+ will do the full promotion logic.
+        // now. Full promotion logic can come later.
         if let advance = result.levelAdvance, advance != advisoryLevel {
             proj.level = advance
         }

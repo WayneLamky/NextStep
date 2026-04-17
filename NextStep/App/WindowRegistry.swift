@@ -100,9 +100,9 @@ final class WindowRegistry {
         project.archivedAt = .now
         try? context.save()
         MarkdownBridge.shared.syncSoon(projectID: projectID)
-        // M5 — pull the now-irrelevant reminder from Reminders.app.
+        // Pull the now-irrelevant reminder from Reminders.app.
         RemindersBridge.shared.deleteReminder(forProjectID: projectID)
-        // M6 — celebratory chime when a project actually ships.
+        // Celebratory chime when a project actually ships.
         CompletionFX.playProjectArchived()
         closeWindow(for: projectID)
         bump()
