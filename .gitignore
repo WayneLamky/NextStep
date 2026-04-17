@@ -42,3 +42,7 @@ Package.resolved
 
 ## Claude Code local state
 .claude/
+
+## Icon design sources (kept locally; PNGs in AppIcon.appiconset are the source of truth)
+icon-source.png
+icon-source-*.png

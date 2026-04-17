@@ -39,10 +39,6 @@ jobs:
       - name: Install create-dmg
         run: brew install create-dmg
 
-      - name: Regenerate placeholder app icon
-        # 不 checkin 巨大的 1024 PNG，跑时生成
-        run: swift scripts/make-app-icon.swift
-
       - name: Build + sign + DMG
         run: ./scripts/release-opensource.sh
 
