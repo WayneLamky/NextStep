@@ -24,7 +24,12 @@ final class RemindersBridge {
     static let shared = RemindersBridge()
 
     /// EventKit store. Singleton — re-creating wastes the granted access.
-    private let store = EKEventStore()
+    /// `nonisolated(unsafe)` so we can call its async methods (which are
+    /// `nonisolated`) from `@MainActor` context without Swift 6 flagging it
+    /// as a data race. EKEventStore is thread-safe for the calls we make
+    /// (permission request, fetch, save) and we never mutate the reference
+    /// after init — this mirrors `FSWatcher.stream`'s pattern.
+    private nonisolated(unsafe) let store = EKEventStore()
 
     /// UserDefaults key under which we persist the calendarIdentifier of
     /// the calendar we created. We *never* match by title, because the user
