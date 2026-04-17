@@ -14,6 +14,10 @@ on:
   # 允许从 Actions 标签页手动触发（不会创建 Release，只产出 artifact）
   workflow_dispatch:
 
+# 默认 GITHUB_TOKEN 是只读的，创建 Release 需要 contents: write
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: macos-15

@@ -30,10 +30,13 @@ SCHEME="NextStep"
 CONFIG="Release"
 PRODUCT_NAME="NextStep"
 
-# 版本号：优先从 Info.plist，失败用 "dev"
-VERSION="$(/usr/libexec/PlistBuddy -c "Print :CFBundleShortVersionString" \
-          NextStep/Resources/Info.plist 2>/dev/null \
+# 版本号从 pbxproj 里的 MARKETING_VERSION 读（Info.plist 里是
+# `$(MARKETING_VERSION)` 字面量，需要 Xcode 展开，源文件读出来会错）。
+# 多 target 工程会有多行相同，去重后取第一个。
+VERSION="$(grep -E 'MARKETING_VERSION = [0-9]' "${PROJECT}/project.pbxproj" \
+          | head -1 | sed -E 's/.*= ([^;]+);.*/\1/' | tr -d ' ' \
           || echo "dev")"
+VERSION="${VERSION:-dev}"
 
 BUILD_DIR="./build"
 DIST_DIR="./dist"
