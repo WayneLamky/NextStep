@@ -5,6 +5,7 @@ final class MenuBarController: NSObject, NSMenuDelegate {
     private let statusItem: NSStatusItem
     private let onNewProject: (ProjectLevel) -> Void
     private let onNewTempTask: () -> Void
+    private let onOpenIntake: () -> Void
     private let onOpenProject: (Project) -> Void
     private let onOpenSettings: () -> Void
     private let onOpenArchive: () -> Void
@@ -14,6 +15,7 @@ final class MenuBarController: NSObject, NSMenuDelegate {
     init(
         onNewProject: @escaping (ProjectLevel) -> Void,
         onNewTempTask: @escaping () -> Void,
+        onOpenIntake: @escaping () -> Void,
         onOpenProject: @escaping (Project) -> Void,
         onOpenSettings: @escaping () -> Void,
         onOpenArchive: @escaping () -> Void,
@@ -22,6 +24,7 @@ final class MenuBarController: NSObject, NSMenuDelegate {
     ) {
         self.onNewProject = onNewProject
         self.onNewTempTask = onNewTempTask
+        self.onOpenIntake = onOpenIntake
         self.onOpenProject = onOpenProject
         self.onOpenSettings = onOpenSettings
         self.onOpenArchive = onOpenArchive
@@ -100,6 +103,14 @@ final class MenuBarController: NSObject, NSMenuDelegate {
         tempTask.target = self
         menu.addItem(tempTask)
 
+        let intake = NSMenuItem(
+            title: "AI 规划…",
+            action: #selector(handleIntake),
+            keyEquivalent: ""
+        )
+        intake.target = self
+        menu.addItem(intake)
+
         // Hidden projects
         let hidden = WindowRegistry.shared.hiddenProjects()
         if !hidden.isEmpty {
@@ -170,6 +181,7 @@ final class MenuBarController: NSObject, NSMenuDelegate {
     }
 
     @objc private func handleNewTempTask() { onNewTempTask() }
+    @objc private func handleIntake()      { onOpenIntake() }
     @objc private func handleSettings()    { onOpenSettings() }
     @objc private func handleArchive()     { onOpenArchive() }
     @objc private func handleAbout()       { onOpenAbout() }

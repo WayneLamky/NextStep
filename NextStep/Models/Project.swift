@@ -33,6 +33,14 @@ final class Project {
     var pomodoroDuration: TimeInterval?
     var pomodoroPaused: Bool
 
+    /// Target completion date the user committed to during Q&A intake.
+    /// `nil` for open-ended projects. Surfaced in markdown + expanded view.
+    var deadline: Date?
+    /// Minutes per day the user said they'd allocate. `0` means unset.
+    /// The LLM uses this to size the next-action; UI also shows it as a
+    /// target line under the hero CTA.
+    var dailyMinutes: Int
+
     var createdAt: Date
     var modifiedAt: Date
 
@@ -48,13 +56,16 @@ final class Project {
         positionX: Double = 200,
         positionY: Double = 200,
         width: Double = 280,
-        height: Double = 240
+        height: Double = 240,
+        deadline: Date? = nil,
+        dailyMinutes: Int = 0,
+        estimatedMinutes: Int? = nil
     ) {
         self.id = id
         self.name = name
         self.levelRaw = level.rawValue
         self.currentNextAction = currentNextAction
-        self.estimatedMinutes = nil
+        self.estimatedMinutes = estimatedMinutes
         self.monthGoal = monthGoal
         self.weekGoal = weekGoal
         self.dayAction = dayAction
@@ -73,6 +84,8 @@ final class Project {
         self.pomodoroStartedAt = nil
         self.pomodoroDuration = nil
         self.pomodoroPaused = false
+        self.deadline = deadline
+        self.dailyMinutes = dailyMinutes
         self.createdAt = .now
         self.modifiedAt = .now
     }

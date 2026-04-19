@@ -50,6 +50,41 @@ final class WindowRegistry {
         return project
     }
 
+    /// Create a fully-populated project in one shot. Used by the Q&A intake
+    /// synthesis path — the sticky appears with `currentNextAction`, all
+    /// three goal tiers, and (optionally) deadline / dailyMinutes already
+    /// filled in. Also kicks off markdown + reminders sync immediately so
+    /// the user sees state propagate without manual edits.
+    @discardableResult
+    func createProject(seeded seed: ProjectSeed, at point: NSPoint? = nil) -> Project {
+        let anchor = point ?? defaultSpawnPoint()
+        let project = Project(
+            name: seed.name,
+            level: seed.level,
+            currentNextAction: seed.seededNextAction,
+            monthGoal: seed.monthGoal,
+            weekGoal: seed.weekGoal,
+            dayAction: seed.dayAction,
+            colorIndex: Int.random(in: 0..<ProjectPalette.count),
+            positionX: Double(anchor.x),
+            positionY: Double(anchor.y),
+            deadline: seed.deadlineDate,
+            dailyMinutes: seed.dailyMinutes,
+            estimatedMinutes: seed.estimatedMinutes
+        )
+        // The seeded first action counts as a "filled current next step" —
+        // stamp modifiedAt forward so md writeback + reminder sync below
+        // actually run (they no-op on an untouched row).
+        project.modifiedAt = .now
+        context.insert(project)
+        try? context.save()
+        openWindow(for: project)
+        bump()
+        MarkdownBridge.shared.syncSoon(projectID: project.id)
+        RemindersBridge.shared.syncProjectNextAction(projectID: project.id)
+        return project
+    }
+
     // MARK: - Window lifecycle
 
     func openWindow(for project: Project) {

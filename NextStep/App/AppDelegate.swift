@@ -14,6 +14,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         menuBarController = MenuBarController(
             onNewProject:    { [weak self] level in self?.handleNewProject(level: level) },
             onNewTempTask:   { [weak self] in self?.handleNewTempTask() },
+            onOpenIntake:    { [weak self] in self?.showIntake() },
             onOpenProject:   { project in WindowRegistry.shared.openWindow(for: project) },
             onOpenSettings:  { [weak self] in self?.showSettings() },
             onOpenArchive:   { ArchiveWindowController.shared.show() },
@@ -126,6 +127,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     private func handleNewTempTask() {
         TempTaskInputController.shared.present()
+    }
+
+    // MARK: - Intake
+
+    private func showIntake() {
+        IntakeChatWindowController.shared.show()
     }
 
     // MARK: - Settings

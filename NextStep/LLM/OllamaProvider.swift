@@ -131,4 +131,90 @@ final class OllamaProvider: LLMProvider, @unchecked Sendable {
             levelAdvance: advance
         )
     }
+
+    // MARK: - Q&A Intake chat
+
+    func chat(messages: [ChatMessage], systemPrompt: String) async throws -> ChatTurnResult {
+        let body = try buildChatRequestBody(messages: messages, systemPrompt: systemPrompt)
+
+        var req = URLRequest(url: endpoint)
+        req.httpMethod = "POST"
+        req.setValue("application/json", forHTTPHeaderField: "content-type")
+        req.httpBody = body
+
+        let (data, response) = try await session.data(for: req)
+        guard let http = response as? HTTPURLResponse else {
+            throw LLMError.httpError(
+                status: -1,
+                body: "no response (is ollama running on \(endpoint.host ?? "?"):\(endpoint.port ?? -1)?)"
+            )
+        }
+        guard (200..<300).contains(http.statusCode) else {
+            let bodyStr = String(data: data, encoding: .utf8) ?? "<binary>"
+            throw LLMError.httpError(status: http.statusCode, body: bodyStr)
+        }
+
+        return try parseChatResponse(data: data)
+    }
+
+    private func buildChatRequestBody(messages: [ChatMessage], systemPrompt: String) throws -> Data {
+        var apiMessages: [[String: Any]] = [
+            ["role": "system", "content": systemPrompt],
+        ]
+        for msg in messages {
+            apiMessages.append([
+                "role": msg.role.rawValue,
+                "content": msg.content,
+            ])
+        }
+
+        let payload: [String: Any] = [
+            "model": model,
+            "stream": false,
+            "messages": apiMessages,
+            "format": IntakePrompt.strictTurnSchema,
+            "options": [
+                "temperature": 0.4,
+            ],
+        ]
+
+        return try JSONSerialization.data(withJSONObject: payload, options: [])
+    }
+
+    private func parseChatResponse(data: Data) throws -> ChatTurnResult {
+        guard let root = try JSONSerialization.jsonObject(with: data) as? [String: Any],
+              let message = root["message"] as? [String: Any],
+              let content = message["content"] as? String else {
+            throw LLMError.decodingFailed("missing message.content")
+        }
+
+        let obj = try IntakeDecoding.extractJSONObject(from: content)
+
+        if let turnKind = obj["turn_kind"] as? String {
+            switch turnKind {
+            case "synthesis":
+                guard let synthDict = obj["synthesis"] as? [String: Any] else {
+                    throw LLMError.decodingFailed("turn_kind=synthesis but synthesis is null")
+                }
+                let d = try JSONSerialization.data(withJSONObject: synthDict)
+                return .synthesis(try JSONDecoder().decode(IntakeResult.self, from: d))
+            case "card":
+                guard let cardDict = obj["card"] as? [String: Any] else {
+                    throw LLMError.decodingFailed("turn_kind=card but card is null")
+                }
+                let d = try JSONSerialization.data(withJSONObject: cardDict)
+                let card = try JSONDecoder().decode(QuestionCard.self, from: d)
+                guard !card.questions.isEmpty else {
+                    throw LLMError.decodingFailed("card has 0 questions")
+                }
+                return .card(card)
+            default:
+                break
+            }
+        }
+
+        // Fallback: some local models drop the envelope and just spit out
+        // one of the two shapes directly.
+        return try IntakeDecoding.decodeTurn(fromDict: obj)
+    }
 }

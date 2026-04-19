@@ -15,6 +15,10 @@ struct ProjectSnapshot: Equatable, Sendable {
     var createdAt: Date
     /// Only `"active"` or `"archived"` for now.
     var status: String
+    /// ISO date (YYYY-MM-DD) or nil. Populated by Q&A intake; otherwise nil.
+    var deadline: Date?
+    /// Minutes per day the user committed to. 0 = unset.
+    var dailyMinutes: Int
 }
 
 /// Serialize + deserialize `ProjectSnapshot` to/from the on-disk markdown
@@ -31,6 +35,12 @@ enum MarkdownParser {
         out += "- level: \(snap.level.rawValue)\n"
         out += "- created: \(isoDate.string(from: snap.createdAt))\n"
         out += "- status: \(snap.status)\n"
+        if let d = snap.deadline {
+            out += "- deadline: \(isoDate.string(from: d))\n"
+        }
+        if snap.dailyMinutes > 0 {
+            out += "- daily_minutes: \(snap.dailyMinutes)\n"
+        }
         out += "\n"
         out += "## 目标层级\n"
         out += "\n"
@@ -144,6 +154,8 @@ enum MarkdownParser {
         let level = meta["level"].flatMap { ProjectLevel(rawValue: $0) } ?? .week
         let created = meta["created"].flatMap { isoDate.date(from: $0) } ?? .now
         let status = meta["status"] ?? "active"
+        let deadline = meta["deadline"].flatMap { isoDate.date(from: $0) }
+        let dailyMinutes = Int(meta["daily_minutes"] ?? "") ?? 0
 
         return ProjectSnapshot(
             id: id,
@@ -155,7 +167,9 @@ enum MarkdownParser {
             currentNextAction: sectionBody(sections, "当前下一步"),
             completed: history,
             createdAt: created,
-            status: status
+            status: status,
+            deadline: deadline,
+            dailyMinutes: dailyMinutes
         )
     }
 
@@ -207,7 +221,9 @@ extension ProjectSnapshot {
             currentNextAction: project.currentNextAction,
             completed: project.completedHistory,
             createdAt: project.createdAt,
-            status: project.isArchived ? "archived" : "active"
+            status: project.isArchived ? "archived" : "active",
+            deadline: project.deadline,
+            dailyMinutes: project.dailyMinutes
         )
     }
 
@@ -240,6 +256,15 @@ extension ProjectSnapshot {
         if project.isArchived != shouldArchive {
             project.isArchived = shouldArchive
             project.archivedAt = shouldArchive ? .now : nil
+            changed = true
+        }
+
+        if project.deadline != deadline {
+            project.deadline = deadline
+            changed = true
+        }
+        if project.dailyMinutes != dailyMinutes {
+            project.dailyMinutes = dailyMinutes
             changed = true
         }
 

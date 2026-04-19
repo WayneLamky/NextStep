@@ -190,4 +190,123 @@ final class ClaudeProvider: LLMProvider, @unchecked Sendable {
 
         throw LLMError.noToolUseInResponse
     }
+
+    // MARK: - Q&A Intake chat
+
+    func chat(messages: [ChatMessage], systemPrompt: String) async throws -> ChatTurnResult {
+        guard let apiKey = KeychainStore.get(.anthropic),
+              !apiKey.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+            throw LLMError.missingAPIKey(providerLabel: "Anthropic")
+        }
+
+        let body = try buildChatRequestBody(messages: messages, systemPrompt: systemPrompt)
+
+        var req = URLRequest(url: endpoint)
+        req.httpMethod = "POST"
+        req.setValue("application/json", forHTTPHeaderField: "content-type")
+        req.setValue(apiKey, forHTTPHeaderField: "x-api-key")
+        req.setValue(apiVersion, forHTTPHeaderField: "anthropic-version")
+        req.httpBody = body
+
+        let (data, response) = try await session.data(for: req)
+        guard let http = response as? HTTPURLResponse else {
+            throw LLMError.httpError(status: -1, body: "no response")
+        }
+        guard (200..<300).contains(http.statusCode) else {
+            let bodyStr = String(data: data, encoding: .utf8) ?? "<binary>"
+            throw LLMError.httpError(status: http.statusCode, body: bodyStr)
+        }
+
+        return try parseChatResponse(data: data)
+    }
+
+    private func buildChatRequestBody(messages: [ChatMessage], systemPrompt: String) throws -> Data {
+        guard let askSchema = try JSONSerialization.jsonObject(
+            with: Data(IntakePrompt.askQuestionsSchemaJSON.utf8)
+        ) as? [String: Any] else {
+            throw LLMError.decodingFailed("ask_questions schema is not a JSON object")
+        }
+        guard let synthSchema = try JSONSerialization.jsonObject(
+            with: Data(IntakePrompt.synthesizePlanSchemaJSON.utf8)
+        ) as? [String: Any] else {
+            throw LLMError.decodingFailed("synthesize_plan schema is not a JSON object")
+        }
+
+        var systemBlock: [String: Any] = [
+            "type": "text",
+            "text": systemPrompt,
+        ]
+        if isOfficialAnthropic {
+            systemBlock["cache_control"] = ["type": "ephemeral"]
+        }
+
+        let apiMessages: [[String: Any]] = messages.map { msg in
+            [
+                "role": msg.role.rawValue,
+                "content": [
+                    ["type": "text", "text": msg.content]
+                ],
+            ]
+        }
+
+        let tools: [[String: Any]] = [
+            [
+                "name": IntakePrompt.askQuestionsToolName,
+                "description": IntakePrompt.askQuestionsToolDesc,
+                "input_schema": askSchema,
+            ],
+            [
+                "name": IntakePrompt.synthesizeToolName,
+                "description": IntakePrompt.synthesizeToolDesc,
+                "input_schema": synthSchema,
+            ],
+        ]
+
+        let payload: [String: Any] = [
+            "model": model,
+            "max_tokens": 2048,
+            "system": [systemBlock],
+            "messages": apiMessages,
+            "tools": tools,
+            // tool_choice: any forces the model to call exactly one of our
+            // two tools — no prose, no deciding to skip. "any" disallows
+            // non-tool responses; "auto" would let Claude answer in text.
+            "tool_choice": ["type": "any"],
+        ]
+
+        return try JSONSerialization.data(withJSONObject: payload, options: [])
+    }
+
+    private func parseChatResponse(data: Data) throws -> ChatTurnResult {
+        guard let root = try JSONSerialization.jsonObject(with: data) as? [String: Any] else {
+            throw LLMError.decodingFailed("response is not a JSON object")
+        }
+        guard let content = root["content"] as? [[String: Any]] else {
+            throw LLMError.decodingFailed("missing content array")
+        }
+
+        for block in content {
+            guard let type = block["type"] as? String, type == "tool_use" else { continue }
+            guard let name = block["name"] as? String else { continue }
+            guard let input = block["input"] as? [String: Any] else {
+                throw LLMError.decodingFailed("tool_use input missing")
+            }
+
+            if name == IntakePrompt.synthesizeToolName {
+                let inputData = try JSONSerialization.data(withJSONObject: input)
+                let result = try JSONDecoder().decode(IntakeResult.self, from: inputData)
+                return .synthesis(result)
+            }
+            if name == IntakePrompt.askQuestionsToolName {
+                let inputData = try JSONSerialization.data(withJSONObject: input)
+                let card = try JSONDecoder().decode(QuestionCard.self, from: inputData)
+                guard !card.questions.isEmpty else {
+                    throw LLMError.decodingFailed("ask_questions returned 0 questions")
+                }
+                return .card(card)
+            }
+        }
+
+        throw LLMError.noToolUseInResponse
+    }
 }

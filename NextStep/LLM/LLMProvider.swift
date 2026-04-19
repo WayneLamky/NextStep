@@ -76,6 +76,17 @@ enum LLMError: LocalizedError {
 /// Every provider (Claude / OpenAI / Ollama) conforms to this single entry point.
 protocol LLMProvider: Sendable {
     func generateNextAction(context: NextActionContext) async throws -> NextActionResult
+
+    /// Q&A intake turn. The coordinator passes the full user/assistant
+    /// message history and a frozen system prompt; the provider returns
+    /// either another `QuestionCard` (keep asking) or the terminal
+    /// `IntakeResult` (enough info, here's the plan).
+    ///
+    /// Implementations pick their own structured-output mechanism
+    /// (Claude → two tools with `tool_choice: any`; OpenAI → json_schema
+    /// strict; Ollama → /api/chat + format schema). The coordinator only
+    /// sees the unified `ChatTurnResult`.
+    func chat(messages: [ChatMessage], systemPrompt: String) async throws -> ChatTurnResult
 }
 
 /// Which backend the user picked in Settings. Each kind owns its own

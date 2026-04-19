@@ -45,6 +45,13 @@
 		FC010001A00000000000AV01 /* ArchiveView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC010000A00000000000AV01 /* ArchiveView.swift */; };
 		FC010001A00000000000AW01 /* ArchiveWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC010000A00000000000AW01 /* ArchiveWindow.swift */; };
 		FC010001A00000000000AB01 /* AboutWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC010000A00000000000AB01 /* AboutWindow.swift */; };
+		FC010001A00000000000IR01 /* IntakeResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC010000A00000000000IR01 /* IntakeResult.swift */; };
+		FC010001A00000000000IP01 /* IntakePrompt.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC010000A00000000000IP01 /* IntakePrompt.swift */; };
+		FC010001A00000000000AI01 /* AttachmentIngest.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC010000A00000000000AI01 /* AttachmentIngest.swift */; };
+		FC010001A00000000000IS01 /* IntakeSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC010000A00000000000IS01 /* IntakeSession.swift */; };
+		FC010001A00000000000IC01 /* IntakeCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC010000A00000000000IC01 /* IntakeCoordinator.swift */; };
+		FC010001A00000000000ICV01 /* IntakeChatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC010000A00000000000ICV01 /* IntakeChatView.swift */; };
+		FC010001A00000000000ICW01 /* IntakeChatWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC010000A00000000000ICW01 /* IntakeChatWindow.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -87,6 +94,13 @@
 		FC010000A00000000000AV01 /* ArchiveView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchiveView.swift; sourceTree = "<group>"; };
 		FC010000A00000000000AW01 /* ArchiveWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchiveWindow.swift; sourceTree = "<group>"; };
 		FC010000A00000000000AB01 /* AboutWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutWindow.swift; sourceTree = "<group>"; };
+		FC010000A00000000000IR01 /* IntakeResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntakeResult.swift; sourceTree = "<group>"; };
+		FC010000A00000000000IP01 /* IntakePrompt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntakePrompt.swift; sourceTree = "<group>"; };
+		FC010000A00000000000AI01 /* AttachmentIngest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttachmentIngest.swift; sourceTree = "<group>"; };
+		FC010000A00000000000IS01 /* IntakeSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntakeSession.swift; sourceTree = "<group>"; };
+		FC010000A00000000000IC01 /* IntakeCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntakeCoordinator.swift; sourceTree = "<group>"; };
+		FC010000A00000000000ICV01 /* IntakeChatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntakeChatView.swift; sourceTree = "<group>"; };
+		FC010000A00000000000ICW01 /* IntakeChatWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntakeChatWindow.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -108,6 +122,7 @@
 			children = (
 				FC010000A00000000000AV01 /* ArchiveView.swift */,
 				FC010000A00000000000EH01 /* ExpandedHierarchyView.swift */,
+				FC010000A00000000000ICV01 /* IntakeChatView.swift */,
 				0BD529C808C12BCC0A8DD2A1 /* SettingsView.swift */,
 				56762D27526B7B702FB4EDCD /* StickyView.swift */,
 			);
@@ -149,12 +164,25 @@
 				95C7F782FB385BD62A6CA3C2 /* AppDelegate.swift */,
 				FC010000A00000000000AW01 /* ArchiveWindow.swift */,
 				FC010000A00000000000EW01 /* ExpandedHierarchyWindow.swift */,
+				FC010000A00000000000ICW01 /* IntakeChatWindow.swift */,
 				65C5152CBF96984F19045485 /* NextStepApp.swift */,
 				6AC9AAEE23BC45D665952A41 /* StickyPanel.swift */,
 				C8E96535E6601BF480BFE61B /* StickyWindowController.swift */,
 				EEAB8DCF269652A20B91ACE9 /* WindowRegistry.swift */,
 			);
 			path = App;
+			sourceTree = "<group>";
+		};
+		FC020000A00000000000INTK /* Intake */ = {
+			isa = PBXGroup;
+			children = (
+				FC010000A00000000000AI01 /* AttachmentIngest.swift */,
+				FC010000A00000000000IC01 /* IntakeCoordinator.swift */,
+				FC010000A00000000000IP01 /* IntakePrompt.swift */,
+				FC010000A00000000000IR01 /* IntakeResult.swift */,
+				FC010000A00000000000IS01 /* IntakeSession.swift */,
+			);
+			path = Intake;
 			sourceTree = "<group>";
 		};
 		8B106EF8FA34A370F2779B7C /* MenuBar */ = {
@@ -187,6 +215,7 @@
 				FC020000A00000000000FOCU /* Focus */,
 				3F4A2CE4EAB15EA34DFFF867 /* Hotkey */,
 				DEFEB71F7676AF4C9F8F7BC9 /* Input */,
+				FC020000A00000000000INTK /* Intake */,
 				172A34C7B19A7528882EF603 /* LLM */,
 				8B106EF8FA34A370F2779B7C /* MenuBar */,
 				3A2858DB79E212F8E8C38B5F /* Models */,
@@ -370,6 +399,13 @@
 				FC010001A00000000000AV01 /* ArchiveView.swift in Sources */,
 				FC010001A00000000000AW01 /* ArchiveWindow.swift in Sources */,
 				FC010001A00000000000AB01 /* AboutWindow.swift in Sources */,
+				FC010001A00000000000IR01 /* IntakeResult.swift in Sources */,
+				FC010001A00000000000IP01 /* IntakePrompt.swift in Sources */,
+				FC010001A00000000000AI01 /* AttachmentIngest.swift in Sources */,
+				FC010001A00000000000IS01 /* IntakeSession.swift in Sources */,
+				FC010001A00000000000IC01 /* IntakeCoordinator.swift in Sources */,
+				FC010001A00000000000ICV01 /* IntakeChatView.swift in Sources */,
+				FC010001A00000000000ICW01 /* IntakeChatWindow.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -446,7 +482,7 @@
 				INFOPLIST_FILE = NextStep/Resources/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 15.0;
-				MARKETING_VERSION = 0.1.2;
+				MARKETING_VERSION = 0.1.3;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.claw.nextstep;
@@ -521,7 +557,7 @@
 				INFOPLIST_FILE = NextStep/Resources/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 15.0;
-				MARKETING_VERSION = 0.1.2;
+				MARKETING_VERSION = 0.1.3;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
